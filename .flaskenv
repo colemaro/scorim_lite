@@ -1,0 +1,2 @@
+FLASK_APP = scorim.py
+FLASK_DEBUG = 1

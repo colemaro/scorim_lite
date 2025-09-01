@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+
+            <div id="sliceNumber1"></div>
+            <div id="dicomImage1" style="height:850px; background-color:black;" oncontextmenu="return false"></div>
+            <p style="color: #212121">{{page_items[0][1][20:]}}</p>
+        </div>
+        <div class="col-6">
+
+            <div id="sliceNumber2"></div>
+            <div id="dicomImage2" style="height:850px; background-color:black;" oncontextmenu="return false"></div>
+            <p style="color: #212121">{{page_items[1][1][20:]}}</p>
+
+        </div>
+    </div>
+</div>
+<script>
+    cornerstoneTools.init(); 
+    
+    const PanTool = cornerstoneTools.PanTool;
+    const ZoomTool = cornerstoneTools.ZoomTool; 
+    const WwwcTool = cornerstoneTools.WwwcTool;
+
+    const element1 = document.getElementById('dicomImage1')
+    cornerstone.enable(element1)
+    const element2 = document.getElementById('dicomImage2')
+    cornerstone.enable(element2)
+
+    cornerstoneTools.addTool(PanTool);
+    cornerstoneTools.addTool(ZoomTool);
+    cornerstoneTools.addTool(WwwcTool);
+
+    cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+    cornerstoneWADOImageLoader.webWorkerManager.initialize({
+        taskConfiguration: {
+            decodeTask: {
+                usePDFJS: false
+            }
+        }
+    });
+
+    cornerstoneTools.setToolActive('Pan', { mouseButtonMask: 1 });
+    cornerstoneTools.setToolActive('Zoom', { mouseButtonMask: 4 });
+    cornerstoneTools.setToolActive('Wwwc', { mouseButtonMask: 2 });
+
+    const scheme = "wadouri";
+
+    console.log('Serving Single Image');
+    const dicomUrl1 = {{page_items[0][1] | tojson}};
+    console.log(dicomUrl1)
+    const imageId1 = `${scheme}:${dicomUrl1}`;
+
+    const dicomUrl2 = {{page_items[1][1] | tojson}};
+    console.log(dicomUrl2)
+    const imageId2 = `${scheme}:${dicomUrl2}`;
+
+    cornerstone.loadImage(imageId1).then(function(image) {
+        cornerstone.displayImage(element1, image);
+    }).catch(function(error) {
+        console.error(error);
+    });
+
+    cornerstone.loadImage(imageId2).then(function(image) {
+        cornerstone.displayImage(element2, image);
+    }).catch(function(error) {
+        console.error(error);
+    });
+
+    element1.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    element1.addEventListener('mousedown', function(e){
+        if (e.button ===1) {
+            e.preventDefault();
+        }
+    });
+
+    element2.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    element2.addEventListener('mousedown', function(e){
+        if (e.button ===1) {
+            e.preventDefault();
+        }
+    });
+
+
+    let nextUrl = "TODO";
+
+</script>
+
+{% endblock %}
